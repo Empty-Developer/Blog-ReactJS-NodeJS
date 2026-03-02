@@ -7,8 +7,11 @@ import { registerValidation, loginValidation, postCreateValidation } from './val
 
 import checkAuth from './utils/checkAuth.js'
 
+import dotenv from 'dotenv'
+dotenv.config()
+
 mongoose
-    .connect('mongodb+srv://emptypageworking_db_user:f0lSrhC2uu7TsKYb@cluster0.n2nmvvm.mongodb.net/blog?appName=Cluster0')
+    .connect(process.env.MONGODB_URI)
     .then(() => {console.log('DB OK')})
     .catch((err)=> console.log('DB Error', err))
 
