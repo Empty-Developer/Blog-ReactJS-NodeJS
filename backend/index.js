@@ -1,5 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import multer from 'multer'
+import fs from 'fs'
 
 import * as UserController from './controllers/UserController.js'
 import * as PostController from './controllers/PostController.js'
@@ -8,6 +10,7 @@ import { registerValidation, loginValidation, postCreateValidation } from './val
 import checkAuth from './utils/checkAuth.js'
 
 import dotenv from 'dotenv'
+import handleValidationErrors from './validations/handleValidationErrors.js'
 dotenv.config()
 
 mongoose
@@ -17,20 +20,42 @@ mongoose
 
 const app = express()
 
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads')
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads')
+    },
+    filename: (req, file, cb) => {
+        const name = file.originalname.replace(/\s+/g, '_')
+        cb(null, Date.now() + '_' + name)
+    }
+})
+
+const upload = multer({ storage })
+
 app.use(express.json())
 
-app.post('/auth/login', loginValidation, UserController.login)
+app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login)
 app.get('/auth/me', checkAuth, UserController.getMe)
-app.post('/auth/register', registerValidation, UserController.register)
+app.post('/auth/register',  registerValidation, handleValidationErrors, UserController.register)
+
+app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+    res.json({
+        url: `/uploads/${req.file.originalname}`
+    })
+})
+app.use('/uploads', express.static('uploads'))
 
 app.get('/posts', PostController.getAll)
 app.get('/posts/:id', PostController.getOne)
-app.post('/posts', checkAuth, postCreateValidation, PostController.create)
+app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create)
 app.delete('/posts/:id', checkAuth, PostController.remove)
-app.patch('/posts/:id', checkAuth, PostController.update)
+app.patch('/posts/:id', checkAuth, handleValidationErrors, PostController.update)
 
-
-app.listen(4444, (err) => {
+app.listen(4000, (err) => {
     if (err) {
         return console.log(err)
     }
@@ -39,4 +64,4 @@ app.listen(4444, (err) => {
 })
 
 
-// nodemon, node, js, express, jsonwebtoken JWT, mongoose, express-validator, bcrypt
+// nodemon, node, js, express, jsonwebtoken JWT, mongoose, express-validator, bcrypt, multer
