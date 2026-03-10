@@ -2,15 +2,11 @@ import express from 'express'
 import mongoose from 'mongoose'
 import multer from 'multer'
 import fs from 'fs'
-
-import * as UserController from './controllers/UserController.js'
-import * as PostController from './controllers/PostController.js'
+import  { UserController, PostController } from './controllers/index.js'
 import { registerValidation, loginValidation, postCreateValidation } from './validations/validations.js'
-
-import checkAuth from './utils/checkAuth.js'
-
+import {checkAuth, handleValidationErrors} from './utils/index.js'
 import dotenv from 'dotenv'
-import handleValidationErrors from './validations/handleValidationErrors.js'
+
 dotenv.config()
 
 mongoose
