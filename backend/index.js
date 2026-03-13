@@ -6,6 +6,7 @@ import  { UserController, PostController } from './controllers/index.js'
 import { registerValidation, loginValidation, postCreateValidation } from './validations/validations.js'
 import {checkAuth, handleValidationErrors} from './utils/index.js'
 import dotenv from 'dotenv'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -33,7 +34,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 app.use(express.json())
-
+app.use(cors())
 app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login)
 app.get('/auth/me', checkAuth, UserController.getMe)
 app.post('/auth/register',  registerValidation, handleValidationErrors, UserController.register)
@@ -60,4 +61,4 @@ app.listen(4000, (err) => {
 })
 
 
-// nodemon, node, js, express, jsonwebtoken JWT, mongoose, express-validator, bcrypt, multer
+// nodemon, node, js, express, jsonwebtoken JWT, mongoose, express-validator, bcrypt, multer, cors
