@@ -3,24 +3,25 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Grid from '@mui/material/Grid';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts } from '../redux/slices/post';
+import axios from '../axios';
+import {useDispatch, useSelector} from 'react-redux'
 
 import { Post } from '../components/Post';
 import { TagsBlock } from '../components/TagsBlock';
 import { CommentsBlock } from '../components/CommentsBlock';
+import { fetchPosts, fetchTags } from '../redux/slices/post';
 
 export const Home = () => {
-  const dispatch = useDispatch();
-  const { posts, tags } = useSelector(state => state.posts);
-  
-  const postsItems = posts.items;
-  const isLoading = posts.status === 'loading';
+  const dispatch = useDispatch()
+  const {posts, tags} = useSelector(state => state.posts)
+
+  const isPostsLoading = posts.status === 'loading'
+  const isTagsLoading = tags.status === 'loading'
 
   React.useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
-
+    dispatch(fetchPosts())
+    dispatch(fetchTags())
+  }, [])
 
   return (
     <>
@@ -30,31 +31,42 @@ export const Home = () => {
       </Tabs>
       <Grid container spacing={4}>
         <Grid xs={8} item>
-          {isLoading ? (
-            [...Array(3)].map((_, index) => (
-              <Post key={index} isLoading={true} />
-            ))
+          {(isPostsLoading ? [...Array(5)] : posts.items).map((obj, index) => 
+          isPostsLoading ? (
+            <Post key={index} isLoading={true} />
           ) : (
-            postsItems.map((post) => (
-              <Post
-                key={post._id}
-                id={post._id}
-                title={post.title}
-                imageUrl={post.imageUrl ? `http://localhost:4000${post.imageUrl}` : ''}
-                user={post.user}
-                createdAt={post.createdAt}
-                viewsCount={post.viewsCount}
-                commentsCount={post.commentsCount}
-                tags={post.tags}
-                isEditable={false}
-              />
-            ))
-          )}
+            <Post
+              id={obj._id}
+              title={obj.title}
+              imageUrl={"https://png.pngtree.com/thumb_back/fh260/background/20230610/pngtree-picture-of-a-blue-bird-on-a-black-background-image_2937385.jpg"}
+              user={obj.user}
+              createdAt={obj.createdAt}
+              viewsCount={obj.viewsCount}
+              commentsCount={3}
+              tags={obj.tags}
+              isEditable
+            />
+          ))}
         </Grid>
         <Grid xs={4} item>
-          <TagsBlock items={tags.items} isLoading={tags.status === 'loading'} />
+          <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock
-            items={[]}
+            items={[
+              {
+                user: {
+                  fullName: 'Вася Пупкин',
+                  avatarUrl: 'https://mui.com/static/images/avatar/1.jpg',
+                },
+                text: 'Это тестовый комментарий',
+              },
+              {
+                user: {
+                  fullName: 'Иван Иванов',
+                  avatarUrl: 'https://mui.com/static/images/avatar/2.jpg',
+                },
+                text: 'When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top',
+              },
+            ]}
             isLoading={false}
           />
         </Grid>

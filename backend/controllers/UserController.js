@@ -1,34 +1,32 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { validationResult } from 'express-validator'
 import UserModel from '../models/User.js'
 
 export const register = async (req, res) => {
     try {
-
-    const password = req.body.password
-    const salt = await bcrypt.genSalt(10)
-    const hash = await bcrypt.hash(password, salt)
-
-    const doc = new UserModel({
-        email: req.body.email,
-        fullName: req.body.fullName,
-        passwordHash: hash,
-        avatarURL: req.body.avatarURL,
-    })
-
-    const user = await doc.save()
-
-    const token = jwt.sign({
-        _id: user._id,
-    },
+        const password = req.body.password
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(password, salt)
+        
+        const doc = new UserModel({
+            email: req.body.email,
+            fullName: req.body.fullName,
+            passwordHash: hash,
+            avatarURL: req.body.avatarURL,
+        })
     
-    'secret123',
-    {
-        expiresIn: '30d',
-    })
-
-    const {passwordHash, ...userData} = user._doc
+        const user = await doc.save()
+    
+        const token = jwt.sign({
+            _id: user._id,
+        },
+        
+        'secret123',
+        {
+            expiresIn: '30d',
+        })
+    
+        const {passwordHash, ...userData} = user._doc
 
     res.json({
         ...userData,
