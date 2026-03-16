@@ -38,7 +38,7 @@ export const Home = () => {
             <Post
               id={obj._id}
               title={obj.title}
-              imageUrl={"https://png.pngtree.com/thumb_back/fh260/background/20230610/pngtree-picture-of-a-blue-bird-on-a-black-background-image_2937385.jpg"}
+              imageUrl={obj.imageUrl}
               user={obj.user}
               createdAt={obj.createdAt}
               viewsCount={obj.viewsCount}
